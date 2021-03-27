@@ -1,13 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-/**
- * @flow
- */
-
 import * as React from 'react'
-import { StyleSheet, TouchableOpacity } from 'react-native'
-import { Block, Text } from 'galio-framework'
 import GojekIcon from '../Icon'
+import PropTypes from 'prop-types'
+import { Block, Text } from 'galio-framework'
 import Icon from 'react-native-vector-icons/Ionicons'
+import { StyleSheet, TouchableOpacity } from 'react-native'
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 
 const makeStyles = (iconSize = 10) =>
   StyleSheet.create({
@@ -39,7 +37,7 @@ const makeStyles = (iconSize = 10) =>
     },
   })
 
-const Header: () => React$Node = () => {
+const Header = ({ isLoading, ...props }) => {
   const iconSize = 50
   const styles = makeStyles(iconSize)
 
@@ -48,19 +46,28 @@ const Header: () => React$Node = () => {
       <Block style={styles.walletWrapper}>
         <GojekIcon name="gopay" size={iconSize / 1.4} color="#FFF" />
       </Block>
-      <Block style={{ paddingHorizontal: 8 }}>
-        <Block style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text p bold>
-            108.000,00
-          </Text>
-          <Text muted style={{ marginLeft: 3 }}>
-            IDR
+      {isLoading ? (
+        <SkeletonPlaceholder>
+          <SkeletonPlaceholder.Item marginLeft={8}>
+            <SkeletonPlaceholder.Item width={110} height={16} borderRadius={4} />
+            <SkeletonPlaceholder.Item marginTop={4} width={80} height={14} borderRadius={4} />
+          </SkeletonPlaceholder.Item>
+        </SkeletonPlaceholder>
+      ) : (
+        <Block style={{ paddingHorizontal: 8 }}>
+          <Block style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text p bold>
+              108.000,00
+            </Text>
+            <Text muted style={{ marginLeft: 3 }}>
+              IDR
+            </Text>
+          </Block>
+          <Text muted bold>
+            My Ballance
           </Text>
         </Block>
-        <Text muted bold>
-          My Ballance
-        </Text>
-      </Block>
+      )}
       <Block style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center' }}>
         <TouchableOpacity style={styles.buttonIcon}>
           <Icon name="search-outline" size={iconSize / 2} color="#888888" />
@@ -74,6 +81,14 @@ const Header: () => React$Node = () => {
       </Block>
     </Block>
   )
+}
+
+Header.defaultProps = {
+  isLoading: false,
+}
+
+Header.propTypes = {
+  isLoading: PropTypes.bool,
 }
 
 export default Header

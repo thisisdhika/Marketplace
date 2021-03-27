@@ -1,11 +1,12 @@
-/* eslint-disable object-curly-newline */
-import React from 'react'
-import { Image, StyleSheet } from 'react-native'
+import * as React from 'react'
 import PropTypes from 'prop-types'
 import { Block, Text } from 'galio-framework'
+import { Image, StyleSheet } from 'react-native'
 import GalioTheme, { withGalio } from 'galio-framework/src/theme'
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 
-function Card({
+const Card = ({
+  isLoading,
   avatar,
   borderless,
   caption,
@@ -16,8 +17,6 @@ function Card({
   image,
   imageBlockStyle,
   imageStyle,
-  location,
-  locationColor,
   shadow,
   style,
   styles,
@@ -25,7 +24,7 @@ function Card({
   titleColor,
   theme,
   ...props
-}) {
+}) => {
   function renderImage() {
     if (!image) {
       return null
@@ -33,35 +32,13 @@ function Card({
 
     return (
       <Block card style={[styles.imageBlock, imageBlockStyle]}>
-        <Image source={{ uri: image }} style={[styles.image, imageStyle]} />
-      </Block>
-    )
-  }
-
-  function renderAvatar() {
-    if (!avatar) {
-      return null
-    }
-    return <Image source={{ uri: avatar }} style={styles.avatar} />
-  }
-
-  function renderLocation() {
-    if (!location) {
-      return null
-    }
-    if (typeof location !== 'string') {
-      return location
-    }
-
-    return (
-      <Block row right>
-        <Text
-          muted
-          size={theme.SIZES.FONT * 0.875}
-          color={locationColor || theme.COLORS.MUTED}
-          style={{ marginLeft: theme.SIZES.BASE * 0.25 }}>
-          {location}
-        </Text>
+        {isLoading ? (
+          <SkeletonPlaceholder>
+            <SkeletonPlaceholder.Item {...styles.image} {...imageStyle} />
+          </SkeletonPlaceholder>
+        ) : (
+          <Image source={{ uri: image }} style={[styles.image, imageStyle]} />
+        )}
       </Block>
     )
   }
@@ -71,17 +48,44 @@ function Card({
       <Block flex row style={[styles.footer, footerStyle]} space="between">
         <Block flex={1.7}>
           <Block style={styles.title}>
-            <Text size={theme.SIZES.FONT * 0.875} color={titleColor}>
-              {title}
-            </Text>
+            {isLoading ? (
+              <SkeletonPlaceholder>
+                <SkeletonPlaceholder.Item
+                  marginBottom={4}
+                  height={theme.SIZES.FONT * 0.875}
+                  borderRadius={3}
+                  width={150}
+                />
+              </SkeletonPlaceholder>
+            ) : (
+              <Text size={theme.SIZES.FONT * 0.875} color={titleColor}>
+                {title}
+              </Text>
+            )}
           </Block>
           <Block row space="between">
             <Block row right>
-              <Text p muted size={theme.SIZES.FONT * 0.875} color={captionColor}>
-                {caption}
-              </Text>
+              {isLoading ? (
+                <SkeletonPlaceholder>
+                  <SkeletonPlaceholder.Item
+                    marginTop={4}
+                    height={theme.SIZES.FONT * 0.725}
+                    borderRadius={3}
+                    width={200}
+                  />
+                  <SkeletonPlaceholder.Item
+                    marginTop={4}
+                    height={theme.SIZES.FONT * 0.725}
+                    borderRadius={3}
+                    width={150}
+                  />
+                </SkeletonPlaceholder>
+              ) : (
+                <Text p muted size={theme.SIZES.FONT * 0.875} color={captionColor}>
+                  {caption}
+                </Text>
+              )}
             </Block>
-            {renderLocation()}
           </Block>
         </Block>
       </Block>
@@ -103,6 +107,7 @@ Card.defaultProps = {
   card: true,
   shadow: true,
   borderless: false,
+  isLoading: false,
   styles: {},
   theme: GalioTheme,
   title: '',
@@ -110,20 +115,19 @@ Card.defaultProps = {
   caption: '',
   captionColor: '',
   footerStyle: {},
-  avatar: '',
 }
 
 Card.propTypes = {
   card: PropTypes.bool,
   shadow: PropTypes.bool,
   borderless: PropTypes.bool,
+  isLoading: PropTypes.bool,
   styles: PropTypes.any,
   theme: PropTypes.any,
   title: PropTypes.string,
   titleColor: PropTypes.string,
   caption: PropTypes.string,
   captionColor: PropTypes.string,
-  avatar: PropTypes.string,
   footerStyle: PropTypes.object,
 }
 

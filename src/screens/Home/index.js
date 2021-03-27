@@ -1,15 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
-/**
- * @format
- * @flow
- */
-
-import React from 'react'
-import { ImageBackground, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
-import { Icon as GojekIcon, Card, Header } from '../components'
+import * as React from 'react'
 import { Block, Text } from 'galio-framework'
 import Icon from 'react-native-vector-icons/Ionicons'
+import { Icon as GojekIcon, Card, Header } from '../../components'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import {
+  ImageBackground,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native'
 
 const cards = [
   {
@@ -57,68 +58,20 @@ const cards = [
   },
 ]
 
-const styles = StyleSheet.create({
-  card: {
-    marginTop: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    backgroundColor: '#00AED6',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  cardButtonIcon: {
-    paddingVertical: 16,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-  },
-  cardButtonIconText: {
-    marginTop: 4,
-    color: '#FFF',
-  },
-  buttonIcon: {
-    width: '25%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 8,
-  },
-  buttonIconBox: {
-    backgroundColor: '#FFF',
-    marginVertical: 10,
-    shadowColor: '#888',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3,
-    elevation: 3,
-    width: 45,
-    height: 45,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  newsCard: {
-    marginBottom: 20,
-  },
-  newsCardFooter: {
-    backgroundColor: '#FFF',
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-  },
-})
-
-const Home: () => React$Node = () => {
+const Home = () => {
   const insets = useSafeAreaInsets()
+  const isFirst = React.useRef(true)
+  const [isLoading, setIsLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    if (isLoading) {
+      setTimeout(() => setIsLoading(false), 1500)
+    }
+
+    if (isFirst) {
+      isFirst.current = false
+    }
+  }, [isLoading])
 
   return (
     <ScrollView
@@ -130,9 +83,16 @@ const Home: () => React$Node = () => {
         marginTop: 15,
         marginLeft: insets.left,
         marginRight: insets.right,
-      }}>
-      <Header />
-      <ImageBackground source={require('../images/bg-card.png')} style={styles.card}>
+      }}
+      refreshControl={
+        <RefreshControl
+          colors={['#00AA13']}
+          refreshing={!isFirst.current && isLoading}
+          onRefresh={() => !isLoading && setIsLoading(true)}
+        />
+      }>
+      <Header isLoading={isLoading} />
+      <ImageBackground source={require('../../images/bg-card.png')} style={styles.card}>
         <TouchableOpacity style={styles.cardButtonIcon}>
           <Icon name="card-outline" size={30} color="#FFF" />
           <Text muted style={styles.cardButtonIconText} bold>
@@ -228,9 +188,9 @@ const Home: () => React$Node = () => {
         <Text p bold style={{ marginBottom: 8 }}>
           Recommend for you
         </Text>
-        <Block flex space="between">
+        <Block flex>
           {cards &&
-            cards.map((card, id) => (
+            cards.map(card => (
               <Card
                 flex
                 shadow
@@ -243,7 +203,7 @@ const Home: () => React$Node = () => {
                 caption={card.caption}
                 image={card.image}
                 footerStyle={styles.newsCardFooter}
-                avatarStyle={{ width: 0 }}
+                isLoading={isLoading}
               />
             ))}
         </Block>
@@ -251,5 +211,65 @@ const Home: () => React$Node = () => {
     </ScrollView>
   )
 }
+
+const styles = StyleSheet.create({
+  card: {
+    marginTop: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    backgroundColor: '#00AED6',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  cardButtonIcon: {
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  cardButtonIconText: {
+    marginTop: 4,
+    color: '#FFF',
+  },
+  buttonIcon: {
+    width: '25%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  buttonIconBox: {
+    backgroundColor: '#FFF',
+    marginVertical: 10,
+    shadowColor: '#888',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 3,
+    width: 45,
+    height: 45,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  newsCard: {
+    marginBottom: 20,
+  },
+  newsCardFooter: {
+    backgroundColor: '#FFF',
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+})
 
 export default Home
