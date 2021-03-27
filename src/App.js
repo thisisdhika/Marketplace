@@ -48,6 +48,11 @@ const App = () => {
       <StatusBar animated barStyle="dark-content" backgroundColor="#f9f9f9" />
       <NavigationContainer>
         <Tab.Navigator
+          animatedType="timing"
+          animatedOptions={{
+            duration: 400,
+            useNativeDriver: false,
+          }}
           appearance={{
             floating: true,
             shadow: true,
